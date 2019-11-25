@@ -66,9 +66,37 @@ class Th():
         self.LOR_all_val = [self.LOR_param1_val, self.LOR_param2_val]
         self.LOR_comb = zip(self.LOR_param_name, self.LOR_all_val)
         self.LOR_list_def_param = [n[-1] for n in self.LOR_all_val]
+        #----------------------------------------------------
+        #Define theoretical elemental function #6 - Y = [A/(1 + Exp(2*b*(x-C)))   ]
         #------------------------------------------------------------------
-        #
-        self.all_function_name_list = [self.function1_name, self.function2_name, self.function3_name, self.function4_name, self.function5_name]
+        self.function6_name = "Sigmoid"
+        self.SIG_param_name =["A", "B", "C"]
+        self.SIG_param1_val = [0.1, 5, 1]
+        self.SIG_param2_val = [0.1, 5, 1.5]
+        self.SIG_param3_val = [0, 15, 3]
+
+        self.SIG_param_number = len(self.SIG_param_name)
+        self.SIG_all_val = [self.SIG_param1_val, self.SIG_param2_val, self.SIG_param3_val]
+        self.SIG_comb = zip(self.SIG_param_name, self.SIG_all_val)
+        self.SIG_list_def_param = [n[-1] for n in self.SIG_all_val]
+#-------------------New function ----------------------------
+#---!!! Here is the place to define new theoretical elemental function #7 - Y = Y(X) !!!----
+#       self.function7_name = "New_name"
+#       self.NF_param_name =["A", "B", "C"]
+#       self.NF_param1_val = [0.1, 5, 1]
+#       self.NF_param2_val = [0.1, 5, 1.5]
+#       self.NF_param3_val = [0, 15, 3]
+
+#       self.NF_param_number = len(self.NF_param_name)
+#       self.NF_all_val = [self.NF_param1_val, self.NF_param2_val, self.NF_param2_val] # note here the number of parameters
+#       self.NF_comb = zip(self.NF_param_name, self.NF_all_val)
+#       self.NF_list_def_param = [n[-1] for n in self.NF_all_val]
+#-------------------New function ----------------------------
+
+        self.all_function_name_list = [self.function1_name, self.function2_name, self.function3_name, self.function4_name, self.function5_name, self.function6_name]
+#-------------------New function ----------------------------
+#       self.all_function_name_list = [self.function1_name, self.function2_name, self.function3_name, self.function4_name, self.function5_name, self.function6_name, self.function7_name]
+#-------------------New function ----------------------------
 
     # method how to calculate theoretical elemental function #1
     #RuntimeWarning
@@ -100,6 +128,18 @@ class Th():
         self.data_th5_y = (self.a/(2*math.pi))/((data_x-self.x0)**2 + 0.25*self.a**2)
         return np.array([data_x, self.data_th5_y])
 
+    def SIG(self, data_x, arg):
+        self.a, self.b, self.c = arg
+        self.data_th6_y = self.a/(1+np.exp(-2*self.b*(data_x-self.c)))
+        return np.array([data_x, self.data_th6_y])
+
+#-------------------New function ----------------------------
+#   def NF(self, data_x, arg):
+#       self.a, self.b, self.c = arg
+#       self.data_th6_y = self.a+self+b+self.c+data_x
+#       return np.array([data_x, self.data_th6_y])
+#-------------------New function ----------------------------
+
     def function_select(self, f_name, data_x, param_list):
         # depending on the f_name parameters returns certain mathematical function EXP, LOR, etc
         # f_name - is a acronym used to call function, e.g. f_name = "DbSigmoid"
@@ -116,7 +156,15 @@ class Th():
             return self.EXP(data_x, param_list)
         elif f_name == "Lorenz":
             return self.LOR(data_x, param_list)
+        elif f_name == "Sigmoid":
+            return self.SIG(data_x, param_list)
+#-------------------New function ----------------------------
+#       elif f_name == "New_name":
+#           return self.NF(data_x, param_list)
+#-------------------New function ----------------------------
         else:
             pass
 
 theory = Th()
+
+
