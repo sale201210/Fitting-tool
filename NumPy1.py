@@ -47,12 +47,12 @@ class Work():
                 # Process finished with exit code 0 as a difference between current time and time zero (at the start of the experiment)
                 # realtime vector has the same length as time_date vector, has dimension of real minutes (calculated as number of seconds over 60
                 time_min[i] = (int(str(np.datetime64(time_date[i],'s')-np.datetime64(time_date[0],'s')).split()[0]))/60
-                # inital point is set as zero moment of time, the rest time point are calculated in minutes
+                # inital point is set as zero moment of time, the rest time points are calculated in minutes
             self.data_exp = np.around(np.array([time_min, signal1, signal2, signal3]), decimals=4)
 
     def save_exp(self, path, data):
-        #data has format of np.array
-        np.savetxt(path, data.T, fmt='%.4f', delimiter=' ')
+        #data has format of np.array[[time], [signal1], [signal2], [signal3]]
+        np.savetxt(path, data[0:2].T, fmt='%.4f', delimiter=' ') # here we deliberately get keep first two columns only and get rid of another two.
 
     def plot1gr(self, dataset_x, dataset_y, x1_label, y1_label, title):
         # Create the plot object
