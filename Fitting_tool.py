@@ -11,12 +11,13 @@ integral_value = 0
 
 
 #===================================================================================================
+# HelpWin class is not used in Fitting_tool v.1.0
 class HelpWin(wx.Frame):
     def __init__(self, parent):
         wx.Frame.__init__(self, parent, title="Simple tutorial how to use Fitting tool", size = (600,500))
         self.help_panel = HelpPanel(self)
         self.Show()
-
+# HelpPanel class is not used in Fitting_tool v.1.0
 class HelpPanel(wx.Panel):
     def __init__(self, *args, **kwargs):
         wx.Panel.__init__(self, *args, **kwargs)
@@ -60,7 +61,7 @@ class MainWin(wx.Frame):
         file_menu.AppendSeparator()
         SaveAs_item_InFile = file_menu.Append(wx.ID_SAVEAS)
         glob_fun_static = globalfunk_menu.Append(1, "Global Static Graph", "Global Static superposition Graph")
-        glob_fun_dynamic = globalfunk_menu.Append(2, "Global Dynamic Graph", "Global Dynamic superposition Graph")
+        glob_fun_dynamic = globalfunk_menu.Append(2, "Global fitting", "Global Dynamic superposition Graph")
 
         exitItem = file_menu.Append(wx.ID_EXIT)
 
@@ -70,7 +71,7 @@ class MainWin(wx.Frame):
 
         menuBar = wx.MenuBar()
         menuBar.Append(file_menu, "&File")
-        menuBar.Append(globalfunk_menu, "&Function")
+        menuBar.Append(globalfunk_menu, "&Fitting")
         menuBar.Append(help_menu, "&Help")
 
         self.SetMenuBar(menuBar)
@@ -619,11 +620,6 @@ class RighMiddleX_Extclass(wx.Panel):
             self.theory2 = Th() # make object from TH class
 
             if self.current == "DbSigmoid":
-                ''''
-                self.funk_comb_param = self.theory2.DS_comb
-                self.list_current_param = self.theory2.DS_list_def_param
-                self.fun_param_name = self.theory2.DS_param_name
-                '''''
                 self.funk_comb_param = self.theory2.DS_comb
                 self.list_current_param = self.theory2.DS_list_def_param
                 self.fun_param_name = self.theory2.DS_param_name
@@ -633,24 +629,31 @@ class RighMiddleX_Extclass(wx.Panel):
                 self.list_current_param = self.theory2.SN_list_def_param
                 self.fun_param_name = self.theory2.SN_param_name
 
-
             elif self.current == "Gauss":
                 self.funk_comb_param = self.theory2.GS_comb
                 self.list_current_param = self.theory2.GS_list_def_param
                 self.fun_param_name = self.theory2.GS_param_name
-
 
             elif self.current == "EXP":
                 self.funk_comb_param = self.theory2.EXP_comb
                 self.list_current_param = self.theory2.EXP_list_def_param
                 self.fun_param_name = self.theory2.EXP_param_name
 
-
             elif self.current == "Lorenz":
                 self.funk_comb_param = self.theory2.LOR_comb
                 self.list_current_param = self.theory2.LOR_list_def_param
                 self.fun_param_name = self.theory2.LOR_param_name
 
+            elif self.current == "Sigmoid":
+                self.funk_comb_param = self.theory2.SIG_comb
+                self.list_current_param = self.theory2.SIG_list_def_param
+                self.fun_param_name = self.theory2.SIG_param_name
+#-------------------New function ----------------------------
+#           elif self.current == "New_name":
+#               self.funk_comb_param = self.theory2.NF_comb
+#               self.list_current_param = self.theory2.NF_list_def_param
+#               self.fun_param_name = self.theory2.NF_param_name
+#-------------------New function ----------------------------
 
             self.sizer1 = wx.BoxSizer(wx.VERTICAL)
 
@@ -694,7 +697,7 @@ class RighMiddleX_Extclass(wx.Panel):
             # This is needed to let user focus on the most informative part of the curve, if necessary
             #------------------------------------------------------------------
             self.sizer_button_DG = wx.BoxSizer(wx.HORIZONTAL)
-            self.button_Dynamic = wx.Button(self, label = "Dynamic Graph") # define plot dynamic graph button
+            self.button_Dynamic = wx.Button(self, label = "Local fitting") # define plot dynamic graph button
             self.Bind(wx.EVT_BUTTON, self.OnButton_dynamic, self.button_Dynamic)
             self.sizer_button_DG.Add(self.button_Dynamic, 0, wx.ALL, 5)
             self.sizer1.Add(self.sizer_button_DG, 0, wx.CENTER, 0)
@@ -754,34 +757,48 @@ class RighMiddleX_Extclass(wx.Panel):
             pass
 #------------------------------------------------
     def OnSave_data(self, event):
-        self.list_current_param = [float(line[-1].GetValue()) for line in self.TC_obj_list ]
-        self.th_function = self.theory2.function_select(self.current, data.data_exp[0], self.list_current_param)
+        try:
+            self.list_current_param = [float(line[-1].GetValue()) for line in self.TC_obj_list ]
+            self.th_function = self.theory2.function_select(self.current, data.data_exp[0], self.list_current_param)
 
-        with wx.FileDialog(self, "Save cvs file", wildcard="Cvs files (*.cvs)|*.cvs", style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT) as f:
-            if f.ShowModal() == wx.ID_CANCEL:
-                return
-            path = f.GetPath()
-            file = f.GetFilename()
-            try:
-                data.save_exp(path, self.th_function)
-                self.GetGrandParent().GetGrandParent().SetStatusText("The {} dataset has been saved successfully as {}".format(self.current, file))
+            with wx.FileDialog(self, "Save cvs file", wildcard="Cvs files (*.cvs)|*.cvs", style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT) as f:
+                if f.ShowModal() == wx.ID_CANCEL:
+                    return
+                path = f.GetPath()
+                file = f.GetFilename()
+                try:
+                    data.save_exp(path, self.th_function)
+                    self.GetGrandParent().GetGrandParent().SetStatusText("The {} dataset has been saved successfully as {}".format(self.current, file))
 
-            except IOError:
-                wx.LogError("Can't save current data in file '%s'." % path)
+                except IOError:
+                    wx.LogError("Can't save current data in file '%s'." % path)
+        except AttributeError:
+            for jj in range(0,3):
+                self.GetGrandParent().GetGrandParent().SetStatusText("")
+                sleep(0.6)
+                self.GetGrandParent().GetGrandParent().SetStatusText("Please start with opening/importing data file")
+                sleep(0.6)
 
 
 #------------------------------------------------
     def OnFind_integral(self, event):
-        self.list_current_param = [float(line[-1].GetValue()) for line in self.TC_obj_list ]
-        self.left_exp_And_th_limit = int(self.GetGrandParent().GetGrandParent().leftPanel.t_l) # define new variable for left time limit
-        self.right_exp_And_th_limit = int(self.GetGrandParent().GetGrandParent().leftPanel.t_r)
-        #------------ update th_function with new (optimal) parameters
+        try:
+            self.list_current_param = [float(line[-1].GetValue()) for line in self.TC_obj_list ]
+            self.left_exp_And_th_limit = int(self.GetGrandParent().GetGrandParent().leftPanel.t_l) # define new variable for left time limit
+            self.right_exp_And_th_limit = int(self.GetGrandParent().GetGrandParent().leftPanel.t_r)
+            #------------ update th_function with new (optimal) parameters
 
-        self.th_function = self.theory2.function_select(self.current, data.data_exp[0], self.list_current_param)
+            self.th_function = self.theory2.function_select(self.current, data.data_exp[0], self.list_current_param)
 
-        #------------ calculate and show integral
-        self.found_integral = data.intergSignal(self.th_function[0], self.th_function[1], self.left_exp_And_th_limit, self.right_exp_And_th_limit)
-        self.Int_text.SetLabel("Integral = {}".format(self.found_integral))
+            #------------ calculate and show integral
+            self.found_integral = data.intergSignal(self.th_function[0], self.th_function[1], self.left_exp_And_th_limit, self.right_exp_And_th_limit)
+            self.Int_text.SetLabel("Integral = {}".format(self.found_integral))
+        except AttributeError:
+            for jj in range(0,3):
+                self.GetGrandParent().GetGrandParent().SetStatusText("")
+                sleep(0.6)
+                self.GetGrandParent().GetGrandParent().SetStatusText("Please start with opening/importing data file")
+                sleep(0.6)
 #------------------------------------------------
     def OnButton_dynamic(self, event):
         try:
@@ -821,8 +838,12 @@ class RighMiddleX_Extclass(wx.Panel):
             else:
                 pass
 
-        except ValueError:
-            pass
+        except AttributeError:
+            for jj in range(0,3):
+                self.GetGrandParent().GetGrandParent().SetStatusText("")
+                sleep(0.6)
+                self.GetGrandParent().GetGrandParent().SetStatusText("Please start with opening/importing data file")
+                sleep(0.6)
 
 #===================================================================================================
 
