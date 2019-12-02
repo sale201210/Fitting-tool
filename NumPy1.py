@@ -85,19 +85,17 @@ class Work():
         plt.show()
 
     def Signal_error(self, data_th_x, data_th_y): # to calculare error between data_th_y and data_exp[1]
-        error_y = np.zeros(data_th_x.size, dtype='f2')
-        for i in range(0, data_th_x.size):
+        try:
+            error = 1000* np.sqrt( (np.sum( (data_th_y[1]-self.data_exp[1])**2 ))/(self.data_exp[0].size*(self.data_exp[0].size-1)) )
+            return error
+        except AttributeError:
+            pass
 
-            error_y[i] = math.sqrt( (self.data_exp[1][i]-data_th_y[i])**2 )
-        return 1000*np.sum(error_y)/math.sqrt((data_th_x.size-1)*data_th_x.size)
-        #print("The error between EXP and Th data is ",self.error)
 
     def Two_Signals_error(self, data_exp_x, data_exp_y, data_th_x, data_th_y): # Intended be to called with any two signals which have to be compared
         try:
-            error_y = np.zeros(data_th_x.size, dtype='f2')
-            for i in range(0, data_th_x.size):
-                error_y[i] = math.sqrt( (data_exp_y[i] - data_th_y[i])**2 )
-            return 1000*np.sum(error_y)/math.sqrt((data_th_x.size-1)*data_th_x.size)
+            error = 1000* np.sqrt( (np.sum( (data_th_y-data_exp_y)**2 ))/(data_exp_x.size*(data_exp_x.size-1)) )
+            return error
         except AttributeError:
             pass
 
